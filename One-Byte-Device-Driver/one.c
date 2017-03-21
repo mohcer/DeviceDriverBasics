@@ -19,7 +19,7 @@ In case of more than One byte write operation errors this ddevice
 #include <linux/proc_fs.h>
 #include <asm/uaccess.h>
 
-#define DEVICE_NAME "OneByte"
+#define DEVICE_NAME "onebyte"
 
 /*Forward Declaration*/
 int onebyte_open(struct inode *inode, struct file *filep);
@@ -67,9 +67,9 @@ ssize_t onebyte_read(struct file *filep, char *buf, size_t
 	/*please complete the function on your own*/
 	int is_error = 0;
 
-	is_error = copy_to_user( onebyte_data, buf, size_of_message );
+	is_error = put_user( *onebyte_data, buf );
 	if( 0 == is_error ){
-		printk(KERN_INFO "Sucessfully Read %d character to User", size_of_message);
+		printk(KERN_INFO "Read : '%s'", buf);
 
 		return ( size_of_message = 0 ); //clear the position to start and return 0
 	} else {
@@ -79,21 +79,24 @@ ssize_t onebyte_read(struct file *filep, char *buf, size_t
 	}
 }
 
-ssize_t onebyte_write(struct file *filep, const char *buf,
+ssize_t onebyte_write(struct file *filep, const char __user *buf,
 			size_t count, loff_t *f_pos)
 {
 	/*please complete the function on your own*/
-	size_t allowed_to_write = 1;
-	char *_onebyte = kmalloc( sizeof(char), GFP_KERNEL );
-	*_onebyte = buf[0];
+	printk(KERN_INFO "onebyte_write(count : %ld)", count);
 
-	get_user( onebyte_data, _onebyte );
-	if( count > allowed_to_write ){
+	//size_t allowed_to_write = 1;
+	//char *_onebyte = kmalloc( sizeof(char), GFP_KERNEL );
+	//*_onebyte = *buf;
 
+	copy_from_user( onebyte_data, buf, 1 );
+	if( count > 1 ){
+
+		printk(KERN_ALERT "write error no space left on device");
 		return -EFAULT;
 	} 
-
-	return 0;
+	
+	return 1;
 }
 
 static int onebyte_init(void)
@@ -108,7 +111,7 @@ static int onebyte_init(void)
 		return MAJOR_NUMBER;
 	}
 
-	printk(KERN_INFO "Our One Byte Device regustered sucessfully! with %d Major Number", MAJOR_NUMBER);
+	printk(KERN_INFO "Our One Byte Device registered sucessfully! with %d Major Number", MAJOR_NUMBER);
 	// allocate one byte of memory for storage
 	// kmalloc is just like malloc, the second parameter is
 	// the type of memory to be allocated.
@@ -127,7 +130,7 @@ static int onebyte_init(void)
 	*onebyte_data = 'X';
 	printk(KERN_ALERT "This is a onebyte device module\n");
 	printk(KERN_INFO "Create a device file using mknod:\n");
-	printk( KERN_INFO "mknod %s c %d 0\n", DEVICE_NAME, MAJOR_NUMBER );
+	printk( KERN_INFO "mknod /dev/%s -m 0777 c %d 0\n", DEVICE_NAME, MAJOR_NUMBER );
 
 	return 0;
 }
@@ -142,7 +145,7 @@ static void onebyte_exit(void)
 	}
 
 	// unregister the device
-	unregister_chrdev(MAJOR_NUMBER, "onebyte");
+	unregister_chrdev(MAJOR_NUMBER, DEVICE_NAME);
 	printk(KERN_ALERT "Onebyte device module is unloaded\n");
 }
 

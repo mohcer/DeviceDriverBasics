@@ -1,0 +1,1 @@
+cmd_/home/mohsin/kernel_module/DeviceDriverBasics/One-Byte-Device-Driver/one.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/mohsin/kernel_module/DeviceDriverBasics/One-Byte-Device-Driver/one.ko /home/mohsin/kernel_module/DeviceDriverBasics/One-Byte-Device-Driver/one.o /home/mohsin/kernel_module/DeviceDriverBasics/One-Byte-Device-Driver/one.mod.o
