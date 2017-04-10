@@ -1,0 +1,1 @@
+cmd_/home/mohsin/kernel_module/DeviceDriverBasics/Assign4/device_operation.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/mohsin/kernel_module/DeviceDriverBasics/Assign4/device_operation.ko /home/mohsin/kernel_module/DeviceDriverBasics/Assign4/device_operation.o /home/mohsin/kernel_module/DeviceDriverBasics/Assign4/device_operation.mod.o
